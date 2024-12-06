@@ -89,14 +89,16 @@ jobs:
 
     - name: Export
       run: |
-        PRESET_FILE="export_presets.cfg"
-        if [ ! -f "$PRESET_FILE" ]; then
-          echo "File $PRESET_FILE not found!"
+        if [ ! -f export_presets.cfg ]; then
+          echo "File export_presets.cfg not found."
           exit 1
         fi
-        awk -F= '/^\[preset\.[0-9]+\]/{found=1} found && /name/{print $2; found=0}' $>
-          godot --export $PRESET_NAME
-        done
+        awk -F= '/^\[preset\.[0-9]+\]/{found=1}
+        found && /name/ {
+          system("godot --export  $2)
+          found=0
+        }' export_presets.cfg
+
 
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
