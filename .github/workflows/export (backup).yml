@@ -86,15 +86,14 @@ jobs:
       run: |
         keytool -genkey -v -keystore debug.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -keypass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
         keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
+
     - name: Export
       run: |
         PRESET_FILE="export_presets.cfg"
-
         if [ ! -f "$PRESET_FILE" ]; then
           echo "File $PRESET_FILE not found!"
           exit 1
         fi
-
         awk -F= '/^\[preset\.[0-9]+\]/{found=1} found && /name/{print $2; found=0}' $>
           godot --export $PRESET_NAME
         done
