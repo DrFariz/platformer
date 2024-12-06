@@ -90,6 +90,7 @@ jobs:
 
     - name: Export
       run: |
+        mkdir -p export
         if [ ! -f export_presets.cfg ]; then
           echo "File export_presets.cfg not found."
           exit 1
