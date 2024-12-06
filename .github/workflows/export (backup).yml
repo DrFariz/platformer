@@ -88,10 +88,17 @@ jobs:
         keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
     - name: Export
       run: |
-        mkdir -p export
-        EXT=${{ fromJSON(env.EXTS)[env.PLATFORM] || '.zip' }}
-        godot --no-window --export "$PLATFORM" export/$FILENAME$EXT
-        
+        PRESET_FILE="export_presets.cfg"
+
+        if [ ! -f "$PRESET_FILE" ]; then
+          echo "File $PRESET_FILE not found!"
+          exit 1
+        fi
+
+        awk -F= '/^\[preset\.[0-9]+\]/{found=1} found && /name/{print $2; found=0}' $>
+          godot --export $PRESET_NAME
+        done
+
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
       with:
