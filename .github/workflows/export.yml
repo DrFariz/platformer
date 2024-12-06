@@ -1,0 +1,24 @@
+name: Export Godot Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Export Godot Project
+        uses: drfariz/godot3-exporter@v1
+        with:
+          godot-link: "https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_linux_headless.64.zip"
+          templates-link: "https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_export_templates.tpz"
+          platform: "Android"
+          filename: "MyGame"
+          path: "3.6.stable"
+          user: "releaseuser"
+          keypass: "secretpassword123"
