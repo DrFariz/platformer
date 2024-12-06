@@ -71,6 +71,12 @@ jobs:
         sudo mv Godot_* /usr/local/bin/godot
         chmod +x /usr/local/bin/godot
 
+    - name: Set up JDK (Only for Android)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
     - name: Set up Android SDK (Only for Android)
       if: ${{ env.PLATFORM == 'Android' }}
       uses: android-actions/setup-android@v3
