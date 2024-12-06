@@ -85,7 +85,7 @@ jobs:
       if: ${{ env.PLATFORM == 'Android' }}
       run: |
         keytool -genkey -v -keystore debug.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -keypass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
-        keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS } -dname "CN=Android Export,O=Android,C=US"
+        keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
     - name: Export
       run: |
         mkdir -p export
