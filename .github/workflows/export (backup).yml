@@ -76,22 +76,20 @@ jobs:
       id: cache
       with:
         path: |
-          /usr/local/bin/godot
-          /.local/share/godot/templates/${{ env.VERSION }}
-        key: ${{ runner.os }}-godot-${{ env.VERSION }}-v2
+          ~/.local/share/godot/templates/${{ env.VERSION }}
+        key: ${{ runner.os }}-export-templates-${{ env.VERSION }}
 
-    - name: Download Godot & Export Templates
-      if: ${{ env.CACHE == 'false' || steps.cache.outputs.cache-hit != 'true' }}
+    - name: Download Godot
       run: |
         wget $GODOT_LINK -O godot.zip
-        curl -L $TEMPLATES_LINK -o godot-templates.tpz
+        unzip godot.zip
+        sudo mv Godot_* /usr/local/bin/godot
+        chmod +x /usr/local/bin/godot
 
     - name: Extract Godot Export Templates
       if: ${{ env.CACHE == 'false' || steps.cache.outputs.cache-hit != 'true' }}
       run: |
-        unzip godot.zip
-        sudo mv Godot_* /usr/local/bin/godot
-        chmod +x /usr/local/bin/godot
+        curl -L $TEMPLATES_LINK -o godot-templates.tpz
         mkdir -p ~/.local/share/godot/templates/${{ env.VERSION }}
         unzip godot-templates.tpz -d ~/godot-templates
         mv ~/godot-templates/templates/* ~/.local/share/godot/templates/${{ env.VERSION }}/
