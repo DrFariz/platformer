@@ -29,10 +29,6 @@ on:
         required: true
         description: "Debug version"
         type: boolean
-      path:
-        required: true
-        description: "Enter version (for template path):"
-        default: "3.6.stable"
       user:
         description: "Enter user (Only for Android):"
       keypass:
@@ -48,7 +44,6 @@ jobs:
       PLATFORM: ${{ inputs.platform }}
       KEYPASS: ${{ inputs.keypass }}
       USER: ${{ inputs.user }}
-      TPATH: ${{ inputs.path }}
       DEBUG: ${{ inputs.debug }}
  
     steps:
@@ -74,20 +69,16 @@ jobs:
         unzip godot.zip
         sudo mv Godot_* /usr/local/bin/godot
         chmod +x /usr/local/bin/godot
-        echo ========
-        VER=$(godot --version)
-        echo "VERSION: $VER"
-        echo ${{ env.ISANDROID }}
-        godot --export "nguwawor"
-        echo ========
-        exit 0
+        GVERS=$(godot --version)
+        VERSION=$(echo $GVERS | awk -F. '{print $1 "." $2 "." $3}')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
 
     - name: Extract Godot Export Templates
       run: |
-        mkdir -p ~/.local/share/godot/templates/$TPATH
+        mkdir -p ~/.local/share/godot/templates/${{ env.VERSION }}
         unzip godot-templates.tpz -d ~/godot-templates
-        mv ~/godot-templates/templates/* ~/.local/share/godot/templates/$TPATH/
+        mv ~/godot-templates/templates/* ~/.local/share/godot/templates/${{ env.VERSION }}/
         rm -rf ~/godot-templates
 
     - name: Set up JDK (Only for Android)
