@@ -77,16 +77,16 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         wget $GODOT_LINK -O godot.zip
+        curl -L $TEMPLATES_LINK -o godot-templates.tpz
+
+    - name: Extract Godot Export Templates
+      run: |
         unzip godot.zip
         sudo mv Godot_* /usr/local/bin/godot
         chmod +x /usr/local/bin/godot
         GVERS=$(godot --version)
         VERSION=$(echo $GVERS | awk -F. '{print $1 "." $2 "." $3}')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-        curl -L $TEMPLATES_LINK -o godot-templates.tpz
-
-    - name: Extract Godot Export Templates
-      run: |
         mkdir -p ~/.local/share/godot/templates/${{ env.VERSION }}
         unzip godot-templates.tpz -d ~/godot-templates
         mv ~/godot-templates/templates/* ~/.local/share/godot/templates/${{ env.VERSION }}/
