@@ -66,6 +66,7 @@ jobs:
           ISANDROID=$(awk -v -F= '/^\[preset\.[0-9]+\]/{found=1}
             found && /platform/ && $2 ~ /Android/ {print "ISANDROID=true"}' export_presets.cfg)
           echo "$ISANDROID" >> $GITHUB_ENV
+        fi
 
     - name: Download Godot & Export Templates
       run: |
