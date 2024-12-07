@@ -121,7 +121,7 @@ jobs:
             found=0
           }' export_presets.cfg
         else
-          if [ ${{ env.DEBUG }} = true ]; then
+          if [ ${{ env.DEBUG }} = "true" ]; then
             godot --export-debug "$PLATFORM"
           else
             godot --export "$PLATFORM"
