@@ -63,7 +63,18 @@ jobs:
           echo "$ISANDROID" >> $GITHUB_ENV
         fi
 
+    - name: Cache Godot & Export Templates
+      uses: actions/cache@v4
+      id: cache
+      with:
+        path: |
+          ~/godot.zip
+          ~/godot-templates.tpz
+        key: ${{ runner.os }}-godot-and-export-templates
+        restore-keys: ${{ runner.os }}-
+
     - name: Download Godot & Export Templates
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         wget $GODOT_LINK -O godot.zip
         unzip godot.zip
@@ -101,7 +112,7 @@ jobs:
     - name: Export
       run: |
         if [ $PLATFORM = "All" ]; then
-          awk -v debug=$DEBUG -F= '/^\[preset\.[0-9]+\]/{found=1}
+          awk -v debug=${{ env.DEBUG }} -F= '/^\[preset\.[0-9]+\]/{found=1}
           found && /name/ {
             if(debug == "true")
               system("godot --export-debug \" $2 "\"");
@@ -109,8 +120,8 @@ jobs:
               system("godot --export \"" $2 "\"");
             found=0
           }' export_presets.cfg
-        else; then
-          if [ $DEBUG = true ]; then
+        else
+          if [ ${{ env.DEBUG }} = true ]; then
             godot --export-debug $PLATFORM
           else
             godot --export $PLATFORM
