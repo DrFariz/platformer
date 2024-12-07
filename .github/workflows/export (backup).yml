@@ -22,7 +22,7 @@ on:
           - "HTML5"
           - "Mac OSX"
           - "UWP"
-          - "WindowsDesktop"
+          - "Windows Desktop"
           - "Linux/X11"
           - "All"
       debug:
