@@ -126,6 +126,11 @@ jobs:
             godot --export "$PLATFORM"
           fi
         fi
+        echo =========
+        ls -a
+        echo =========
+        ls ~
+        echo =========
 
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
