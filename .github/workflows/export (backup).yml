@@ -18,15 +18,17 @@ on:
         type: choice
         options:
           - "Android"
+          - "iOS"
           - "HTML5"
+          - "Mac OSX"
+          - "UWP"
           - "Windows Desktop"
           - "Linux/X11"
-          - "macOS"
           - "All"
-      filename:
+      debug:
         required: true
-        description: "Enter file name:"
-        pattern: "^[a-zA-Z0-9_]+$"
+        description: "Debug version"
+        type: boolean
       path:
         required: true
         description: "Enter version (for template path):"
@@ -46,16 +48,37 @@ jobs:
       PLATFORM: ${{ inputs.platform }}
       KEYPASS: ${{ inputs.keypass }}
       USER: ${{ inputs.user }}
-      FILENAME: ${{ inputs.filename }}
       TPATH: ${{ inputs.path }}
-      EXTS: '{"Android": ".apk", "Windows Desktop": ".exe", "macOS": ".dmg", "Linux/X11": ".x86_64"}'
+      DEBUG: ${{ inputs.debug }}
  
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Download Godot Export Templates
+    - name: ⚙️ Preapare
       run: |
+        mkdir -p export
+        if [ ! -f export_presets.cfg ]; then
+          echo "Error: File export_presets.cfg not found."
+          exit 1
+        fi
+        if [ $PLATFORM = "All" -o $PLATFORM = "Android" ]; then
+          ISANDROID=$(awk -v debug="true" -F= '/^\[preset\.[0-9]+\]/{found=1}
+            found && /platform/ && $2 - /Android/ {print "ISANDROID=true"}' export_presets.cfg)
+          echo "ISANDROID=$ISANDROID" >> $GITHUB_ENV
+
+    - name: Download Godot & Export Templates
+      run: |
+        wget $GODOT_LINK -O godot.zip
+        unzip godot.zip
+        sudo mv Godot_* /usr/local/bin/godot
+        chmod +x /usr/local/bin/godot
+        echo ========
+        VER=$(godot --version)
+        echo "VERSION: $VER"
+        godot --export "nguwawor"
+        echo ========
+        exit 0
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
 
     - name: Extract Godot Export Templates
@@ -66,51 +89,45 @@ jobs:
         rm -rf ~/godot-templates
 
     - name: Download and Install Godot
-      run: |
-        wget $GODOT_LINK -O godot.zip
-        unzip godot.zip
-        sudo mv Godot_* /usr/local/bin/godot
-        chmod +x /usr/local/bin/godot
 
     - name: Set up JDK (Only for Android)
+      if: ${{ env.ISANDROID == 'true' }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '21'
 
     - name: Set up Android SDK (Only for Android)
-      if: ${{ env.PLATFORM == 'Android' }}
+      if: ${{ env.ISANDROID == 'true' }}
       uses: android-actions/setup-android@v3
 
     - name: Generate Keystore (Only for Android)
-      if: ${{ env.PLATFORM == 'Android' }}
+      if: ${{ env.ISANDROID == 'true' }}
       run: |
         keytool -genkey -v -keystore debug.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -keypass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
         keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
 
     - name: Export
       run: |
-        mkdir -p export
-        if [ ! -f export_presets.cfg ]; then
-          echo "File export_presets.cfg not found."
-          exit 1
+        if [ $PLATFORM = "All" ]; then
+          awk -v debug=$DEBUG -F= '/^\[preset\.[0-9]+\]/{found=1}
+          found && /name/ {
+            if(debug == "true")
+              system("godot --export-debug \" $2 "\"");
+            else
+              system("godot --export \"" $2 "\"");
+            found=0
+          }' export_presets.cfg
+        else; then
+          if [ $DEBUG = true ]; then
+            godot --export-debug $PLATFORM
+          else
+            godot --export $PLATFORM
+          fi
         fi
-        awk -F= '/^\[preset\.[0-9]+\]/{found=1}
-        found && /name/ {
-          system("godot --export " $2)
-          found=0
-        }' export_presets.cfg
-
-    - name: debug
-      run: |
-        echo -----
-        ls -a
-        echo -----
-        ls export
-        echo -----
 
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.FILENAME }}
+        name: Result
         path: export/
