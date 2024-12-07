@@ -76,6 +76,7 @@ jobs:
         echo ========
         VER=$(godot --version)
         echo "VERSION: $VER"
+        echo ${{ env.ISANDROID }}
         godot --export "nguwawor"
         echo ========
         exit 0
@@ -87,8 +88,6 @@ jobs:
         unzip godot-templates.tpz -d ~/godot-templates
         mv ~/godot-templates/templates/* ~/.local/share/godot/templates/$TPATH/
         rm -rf ~/godot-templates
-
-    - name: Download and Install Godot
 
     - name: Set up JDK (Only for Android)
       if: ${{ env.ISANDROID == 'true' }}
