@@ -78,8 +78,7 @@ jobs:
         path: |
           /usr/local/bin/godot
           /.local/share/godot/templates/${{ env.VERSION }}
-        key: ${{ runner.os }}-godot-${{ env.VERSION }}
-        restore-keys: ${{ runner.os }}-godot
+        key: ${{ runner.os }}-godot-${{ env.VERSION }}-v2
 
     - name: Download Godot & Export Templates
       if: ${{ env.CACHE == 'false' || steps.cache.outputs.cache-hit != 'true' }}
