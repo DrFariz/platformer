@@ -29,6 +29,10 @@ on:
         required: true
         description: "Debug version"
         type: boolean
+      cache:
+        required: true
+        description: "Cache"
+        type: boolean
       user:
         description: "Enter user (Only for Android):"
       keypass:
@@ -66,17 +70,18 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Cache Godot & Export Templates
+      if: ${{ inputs.cache == "true" }}
       uses: actions/cache@v4
       id: cache
       with:
         path: |
-          ~/godot.zip
-          ~/godot-templates.tpz
-        key: ${{ runner.os }}-godot-and-export-templates
-        restore-keys: ${{ runner.os }}-
+          godot.zip
+          godot-templates.tpz
+        key: ${{ runner.os }}-godot-${{ env.VERSION }}
+        restore-keys: ${{ runner.os }}-godot
 
     - name: Download Godot & Export Templates
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: ${{ inputs.cache == 'false' || steps.cache.outputs.cache-hit != 'true' }}
       run: |
         wget $GODOT_LINK -O godot.zip
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
@@ -126,11 +131,6 @@ jobs:
             godot --export "$PLATFORM"
           fi
         fi
-        echo =========
-        ls -a
-        echo =========
-        ls ~
-        echo =========
 
     - name: Upload result to artifact
       uses: actions/upload-artifact@v4
