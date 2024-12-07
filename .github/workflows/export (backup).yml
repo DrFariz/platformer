@@ -67,7 +67,7 @@ jobs:
             found && /platform/ && $2 ~ /Android/ {print "ISANDROID=true"}' export_presets.cfg)
           echo "$ISANDROID" >> $GITHUB_ENV
         fi
-        VERSION=$(echo ${{ env.GODOT_LINK }} | sed -E 's/.*\/([0-9]+\.[0-9]+)-([a-z]+).*/\1.\2/')
+        VERSION=$(echo ${{ env.GODOT_LINK }} | sed -E 's|.*\/([0-9]+\.[0-9]+)-([a-z0-9]+).*|\1.\2|')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Cache Godot & Export Templates
@@ -76,8 +76,8 @@ jobs:
       id: cache
       with:
         path: |
-          godot.zip
-          godot-templates.tpz
+          /usr/local/bin/godot
+          /.local/share/godot/templates/${{ env.VERSION }}
         key: ${{ runner.os }}-godot-${{ env.VERSION }}
         restore-keys: ${{ runner.os }}-godot
 
@@ -88,6 +88,7 @@ jobs:
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
 
     - name: Extract Godot Export Templates
+      if: ${{ env.CACHE == 'false' || steps.cache.outputs.cache-hit != 'true' }}
       run: |
         unzip godot.zip
         sudo mv Godot_* /usr/local/bin/godot
