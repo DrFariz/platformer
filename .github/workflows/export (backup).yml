@@ -122,9 +122,9 @@ jobs:
           }' export_presets.cfg
         else
           if [ ${{ env.DEBUG }} = true ]; then
-            godot --export-debug $PLATFORM
+            godot --export-debug "$PLATFORM"
           else
-            godot --export $PLATFORM
+            godot --export "$PLATFORM"
           fi
         fi
 
