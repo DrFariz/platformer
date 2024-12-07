@@ -65,7 +65,7 @@ jobs:
         if [ $PLATFORM = "All" -o $PLATFORM = "Android" ]; then
           ISANDROID=$(awk -v debug="true" -F= '/^\[preset\.[0-9]+\]/{found=1}
             found && /platform/ && $2 - /Android/ {print "ISANDROID=true"}' export_presets.cfg)
-          echo "ISANDROID=$ISANDROID" >> $GITHUB_ENV
+          echo "$ISANDROID" >> $GITHUB_ENV
 
     - name: Download Godot & Export Templates
       run: |
