@@ -26,11 +26,9 @@ on:
           - "Linux/X11"
           - "All"
       debug:
-        required: true
         description: "Debug version"
         type: boolean
       cache:
-        required: true
         description: "Cache"
         type: boolean
       user:
@@ -52,7 +50,7 @@ jobs:
       CACHE: ${{ inputs.cache }}
  
     steps:
-    - name: Checkout repository
+    - name: 🛒 Checkout repository
       uses: actions/checkout@v2
 
     - name: ⚙️ Preapare
@@ -70,36 +68,22 @@ jobs:
         VERSION=$(echo ${{ env.GODOT_LINK }} | sed -E 's|.*\/([0-9]+\.[0-9]+)-([a-z0-9]+).*|\1.\2|')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Godot Export Templates Cache
+    - name: 📝 Godot Export Templates Cache
       if: ${{ env.CACHE == 'true' }}
       uses: actions/cache@v4
       id: templates-cache
       with:
         path: ~/.local/share/godot/templates/${{ env.VERSION }}
-        key: ${{ runner.os }}-export-templates-${{ env.VERSION }}
+        key: ${{ runner.os }}-godot-templates-${{ env.VERSION }}
 
-    - name: Preapare SDK Cache
-      run: |
-        sudo mkdir -p /usr/local/lib/android/sdk
-        sudo chmod -R 755 /usr/local/lib/android/sdk
-        sudo chown -R runner:docker /usr/local/lib/android/sdk
-
-    - name: SDK Cache
-      if: ${{ env.CACHE == 'true' && env.PLATFORM == 'Android' }}
-      uses: actions/cache@v4
-      id: sdk-cache
-      with:
-        path: /usr/local/lib/android/sdk
-        key: ${{ runner.os }}-export-templates-${{ env.VERSION }}
-
-    - name: Download Godot
+    - name: 📥 Download Godot
       run: |
         wget $GODOT_LINK -O godot.zip
         unzip godot.zip
         sudo mv Godot_* /usr/local/bin/godot
         chmod +x /usr/local/bin/godot
 
-    - name: Extract Godot Export Templates
+    - name: 📤 Extract Godot Export Templates
       if: ${{ env.CACHE == 'false' || steps.templates-cache.outputs.cache-hit != 'true' }}
       run: |
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
@@ -108,24 +92,23 @@ jobs:
         mv ~/godot-templates/templates/* ~/.local/share/godot/templates/${{ env.VERSION }}/
         rm -rf ~/godot-templates
 
-    - name: Set up JDK (Only for Android)
+    - name: 📱 Set up JDK (Only for Android)
       if: ${{ env.ISANDROID == 'true' }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Set up Android SDK (Only for Android)
-      if: ${{ (env.ISANDROID == 'true' && inputs.CACHE == 'false') || steps.sdk-cache.outputs.cache-hit != 'true' }}
+    - name: 📱 Set up Android SDK (Only for Android)
       uses: android-actions/setup-android@v3
 
-    - name: Generate Keystore (Only for Android)
+    - name: 🔑 Generate Keystore (Only for Android)
       if: ${{ env.ISANDROID == 'true' }}
       run: |
         keytool -genkey -v -keystore debug.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -keypass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
         keytool -genkey -v -keystore release.keystore -alias ${{ env.USER }} -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ env.KEYPASS }} -dname "CN=Android Export,O=Android,C=US"
 
-    - name: Export
+    - name: 🛠 Export
       run: |
         if [ $PLATFORM = "All" ]; then
           awk -v debug=${{ env.DEBUG }} -F= '/^\[preset\.[0-9]+\]/{found=1}
@@ -144,8 +127,8 @@ jobs:
           fi
         fi
 
-    - name: Upload result to artifact
+    - name: 💾 Upload result to artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Result
+        name: result
         path: export/
