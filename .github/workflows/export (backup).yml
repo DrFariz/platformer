@@ -70,13 +70,26 @@ jobs:
         VERSION=$(echo ${{ env.GODOT_LINK }} | sed -E 's|.*\/([0-9]+\.[0-9]+)-([a-z0-9]+).*|\1.\2|')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Cache Godot & Export Templates
+    - name: Godot Export Templates Cache
       if: ${{ env.CACHE == 'true' }}
       uses: actions/cache@v4
-      id: cache
+      id: templates-cache
       with:
-        path: |
-          ~/.local/share/godot/templates/${{ env.VERSION }}
+        path: ~/.local/share/godot/templates/${{ env.VERSION }}
+        key: ${{ runner.os }}-export-templates-${{ env.VERSION }}
+
+    - name: Preapare SDK Cache
+      run: |
+        sudo mkdir -p /usr/local/lib/android/sdk
+        sudo chmod -R 755 /usr/local/lib/android/sdk
+        sudo chown -R $USER:$USER /usr/local/lib/android/sdk
+
+    - name: SDK Cache
+      if: ${{ env.CACHE == 'true' && env.PLATFORM == 'Android' }}
+      uses: actions/cache@v4
+      id: sdk-cache
+      with:
+        path: /usr/local/lib/android/sdk
         key: ${{ runner.os }}-export-templates-${{ env.VERSION }}
 
     - name: Download Godot
@@ -87,7 +100,7 @@ jobs:
         chmod +x /usr/local/bin/godot
 
     - name: Extract Godot Export Templates
-      if: ${{ env.CACHE == 'false' || steps.cache.outputs.cache-hit != 'true' }}
+      if: ${{ env.CACHE == 'false' || steps.templates-cache.outputs.cache-hit != 'true' }}
       run: |
         curl -L $TEMPLATES_LINK -o godot-templates.tpz
         mkdir -p ~/.local/share/godot/templates/${{ env.VERSION }}
@@ -103,7 +116,7 @@ jobs:
         java-version: '21'
 
     - name: Set up Android SDK (Only for Android)
-      if: ${{ env.ISANDROID == 'true' }}
+      if: ${{ env.ISANDROID == 'true' && inputs.CACHE == 'false' && steps.sdk-cache.outputs.cache-hit != 'true' }}
       uses: android-actions/setup-android@v3
 
     - name: Generate Keystore (Only for Android)
