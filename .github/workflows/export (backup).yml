@@ -82,7 +82,13 @@ jobs:
       run: |
         sudo mkdir -p /usr/local/lib/android/sdk
         sudo chmod -R 755 /usr/local/lib/android/sdk
-        sudo chown -R $USER:$USER /usr/local/lib/android/sdk
+        echo ======
+        echo whoami
+        whoami
+        echo groups
+        groups
+        echo ======
+        sudo chown -R runner:docker /usr/local/lib/android/sdk
 
     - name: SDK Cache
       if: ${{ env.CACHE == 'true' && env.PLATFORM == 'Android' }}
