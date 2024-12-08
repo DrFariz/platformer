@@ -17,7 +17,6 @@ onready var tween = $Tween
 func _ready():
 	hide()
 
-
 func close():
 	get_tree().paused = false
 	# Tween's interpolate_property has these arguments:
@@ -30,7 +29,6 @@ func close():
 			Tween.TRANS_CUBIC, Tween.EASE_OUT)
 	tween.start()
 
-
 func open():
 	show()
 	resume_button.grab_focus()
@@ -41,7 +39,6 @@ func open():
 			_start_position, _end_position, fade_in_duration,
 			Tween.TRANS_CUBIC, Tween.EASE_OUT)
 	tween.start()
-
 
 func _on_ResumeButton_pressed():
 	if not tween.is_active():

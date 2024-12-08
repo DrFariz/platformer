@@ -7,9 +7,9 @@ enum State {
 	DEAD,
 }
 
+
 var _state = State.WALKING
 
-onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
 onready var sprite = $Sprite

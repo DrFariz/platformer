@@ -31,7 +31,7 @@ __meta__ = {
 }
 
 [node name="ViewportContainer1" type="ViewportContainer" parent="Black/SplitContainer"]
-margin_right = 394.0
+margin_right = 506.0
 margin_bottom = 480.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -41,7 +41,7 @@ __meta__ = {
 }
 
 [node name="Viewport1" type="Viewport" parent="Black/SplitContainer/ViewportContainer1"]
-size = Vector2( 394, 480 )
+size = Vector2( 506, 480 )
 size_override_stretch = true
 handle_input_locally = false
 usage = 0
@@ -59,8 +59,8 @@ position = Vector2( 120, 546 )
 action_suffix = "_p2"
 
 [node name="ViewportContainer2" type="ViewportContainer" parent="Black/SplitContainer"]
-margin_left = 406.0
-margin_right = 800.0
+margin_left = 518.0
+margin_right = 1024.0
 margin_bottom = 480.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -70,7 +70,7 @@ __meta__ = {
 }
 
 [node name="Viewport2" type="Viewport" parent="Black/SplitContainer/ViewportContainer2"]
-size = Vector2( 394, 480 )
+size = Vector2( 506, 480 )
 size_override_stretch = true
 handle_input_locally = false
 usage = 0
