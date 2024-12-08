@@ -126,9 +126,10 @@ jobs:
             godot --export "$PLATFORM"
           fi
         fi
+        zip -7 result.zip export/
 
     - name: 💾 Upload result to artifact
       uses: actions/upload-artifact@v4
       with:
         name: result
-        path: export/
+        path: result.zip
