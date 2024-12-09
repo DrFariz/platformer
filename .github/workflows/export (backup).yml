@@ -126,6 +126,9 @@ jobs:
             godot --export "$PLATFORM"
           fi
         fi
+        ls -a
+        echo =====
+        ls export/
         zip -7 result.zip export/
 
     - name: 💾 Upload result to artifact
